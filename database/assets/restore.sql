@@ -8,7 +8,8 @@ CREATE TABLE usuario (
     login VARCHAR(255) NOT NULL,
     senha VARCHAR(255) NOT NULL,
     id_tutor INT references usuario(id_usuario),
-    UNIQUE (cpf)
+    UNIQUE (cpf),
+    UNIQUE(login)
 );
 CREATE TABLE perfil (
     id_perfil SERIAL PRIMARY KEY,
