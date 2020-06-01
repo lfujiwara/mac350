@@ -1,4 +1,4 @@
-CREATE TABLE usuario (
+CREATE SCHEMA exam_tracker CREATE TABLE usuario (
     id_usuario SERIAL PRIMARY KEY,
     cpf CHAR(11) NOT NULL,
     nome VARCHAR(255) NOT NULL,
@@ -9,21 +9,18 @@ CREATE TABLE usuario (
     senha VARCHAR(255) NOT NULL,
     id_tutor INT references usuario(id_usuario),
     UNIQUE (cpf),
-    UNIQUE(login)
-);
-CREATE TABLE perfil (
+    UNIQUE (login)
+) CREATE TABLE perfil (
     id_perfil SERIAL PRIMARY KEY,
     codigo VARCHAR(255) NOT NULL,
     tipo VARCHAR(255),
     UNIQUE (codigo)
-);
---Relacionamento possui
+) --Relacionamento possui
 CREATE TABLE possui (
     id_usuario INT NOT NULL references usuario(id_usuario),
     id_perfil INT NOT NULL references perfil(id_perfil),
     UNIQUE (id_usuario, id_perfil)
-);
-CREATE TABLE servico (
+) CREATE TABLE servico (
     id_servico SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     classe VARCHAR(255) NOT NULL CHECK (
@@ -35,14 +32,12 @@ CREATE TABLE servico (
         )
     ),
     UNIQUE (nome, classe)
-);
---Relacionamento pertence
+) --Relacionamento pertence
 CREATE TABLE pertence (
     id_servico INT NOT NULL references servico(id_servico),
     id_perfil INT NOT NULL references perfil(id_perfil),
     UNIQUE (id_servico, id_perfil)
-);
---Relacionamento tutelamento
+) --Relacionamento tutelamento
 CREATE TABLE tutelamento (
     id_usuario_tutelado INT NOT NULL references usuario(id_usuario),
     id_tutor INT NOT NULL references usuario(id_usuario),
@@ -56,36 +51,31 @@ CREATE TABLE tutelamento (
         id_servico,
         id_perfil
     )
-);
-CREATE TABLE paciente (
+) CREATE TABLE paciente (
     id_paciente SERIAL PRIMARY KEY,
     cpf VARCHAR(11) NOT NULL,
     nome VARCHAR(255) NOT NULL,
     endereco VARCHAR(255) NOT NULL,
     nascimento DATE NOT NULL,
     UNIQUE (cpf)
-);
-CREATE TABLE exame (
+) CREATE TABLE exame (
     id_exame SERIAL PRIMARY KEY,
     tipo VARCHAR(255) NOT NULL,
     virus VARCHAR(255) NOT NULL,
     UNIQUE (tipo, virus)
-);
---Relacionamento gerencia
+) --Relacionamento gerencia
 CREATE TABLE gerencia (
     id_servico INT NOT NULL references servico(id_servico),
     id_exame INT NOT NULL references exame(id_exame),
     UNIQUE (id_servico, id_exame)
-);
---Relacionamento realiza
+) --Relacionamento realiza
 CREATE TABLE realiza (
     id_paciente INT NOT NULL references paciente(id_paciente),
     id_exame INT NOT NULL references exame(id_exame),
     codigo_amostra VARCHAR(255),
     data_de_realizacao TIMESTAMP,
     UNIQUE (id_paciente, id_exame, data_de_realizacao)
-);
---Agregado amostra
+) --Agregado amostra
 CREATE TABLE amostra (
     id_paciente INT NOT NULL references paciente(id_paciente),
     id_exame INT NOT NULL references exame(id_exame),
