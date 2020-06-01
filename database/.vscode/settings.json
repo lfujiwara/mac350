@@ -1,0 +1,16 @@
+{
+  "editor.formatOnSave": true,
+  "sqltools.connections": [
+    {
+      "askForPassword": false,
+      "database": "MAC350_2020",
+      "driver": "PostgreSQL",
+      "name": "pg-jef",
+      "password": "MAC350_2020",
+      "port": 5432,
+      "previewLimit": 50,
+      "server": "localhost",
+      "username": "MAC350_2020"
+    }
+  ]
+}
