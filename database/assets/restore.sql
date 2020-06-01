@@ -74,6 +74,7 @@ CREATE TABLE realiza (
     id_exame INT NOT NULL references exame(id_exame),
     codigo_amostra VARCHAR(255),
     data_de_realizacao TIMESTAMP,
+    data_de_solicitacao TIMESTAMP,
     UNIQUE (id_paciente, id_exame, data_de_realizacao)
 ) --Agregado amostra
 CREATE TABLE amostra (
@@ -83,4 +84,10 @@ CREATE TABLE amostra (
     metodo_de_coleta VARCHAR(255) NOT NULL,
     material VARCHAR(255) NOT NULL,
     UNIQUE (id_paciente, id_exame, codigo_amostra)
+) CREATE TABLE registro_de_uso (
+    id_registro_de_uso SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL references usuario(id_usuario),
+    id_perfil INT NOT NULL references perfil(id_perfil),
+    id_servico INT NOT NULL references servico(id_servico),
+    data_de_uso TIMESTAMP NOT NULL
 );
