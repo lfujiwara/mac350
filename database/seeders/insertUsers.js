@@ -23,7 +23,21 @@ const main = async () => {
   const insertions = ['SET search_path TO exam_tracker;']
 
   users.forEach(user => {
-    const query = knex('usuario').insert(user).toQuery()
+    const params = [
+      user.cpf,
+      user.nome,
+      user.area_de_pesquisa,
+      user.instituicao,
+      user.data_de_nascimento.toISOString(),
+      user.login,
+      user.senha,
+    ]
+
+    const query = knex.raw(
+      `SELECT * FROM inserir_usuario(${params
+        .map(param => `\'${param.toString().replace("'", "''")}\'`)
+        .join(', ')})`
+    )
     insertions.push(`${query};`)
   })
 

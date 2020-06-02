@@ -41,7 +41,7 @@ const generateUsers = (
   uniqueSet = { cpf: new Set(), login: new Set() }
 ) => {
   unique.cpf.add(...uniqueSet.cpf)
-  unique.cpf.add(...uniqueSet.login)
+  unique.login.add(...uniqueSet.login)
 
   return {
     users: [...Array(qty).keys()].map(() => generateUser()),
