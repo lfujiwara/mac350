@@ -5,9 +5,9 @@ const knex = require('knex')({
   connection: {
     host: 'localhost',
     port: '5432',
-    user: 'MAC350_2020',
-    password: 'MAC350_2020',
-    database: 'MAC350_2020',
+    user: 'mac350_2020',
+    password: 'mac350_2020',
+    database: 'mac350_2020',
   },
 })
 
