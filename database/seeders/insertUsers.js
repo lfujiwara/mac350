@@ -20,7 +20,7 @@ const main = async () => {
 
   const usersFilename = `${__dirname}/dump/insert_users.sql`
 
-  const insertions = ['SET search_path TO mac350_schema;']
+  const insertions = ['SET search_path TO exam_tracker;']
 
   users.forEach(user => {
     const query = knex('usuario').insert(user).toQuery()
