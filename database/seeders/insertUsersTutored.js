@@ -24,8 +24,6 @@ const main = async () => {
 
   const generated = generateUsers(USERS_QTY, { cpf: cpfSet, login: loginSet })
 
-  console.log([...cpfSet], [...loginSet])
-
   const users = generated.users.map(user => ({
     ...user,
     id_tutor: tutors[Math.floor(Math.random() * tutors.length)],
@@ -55,6 +53,8 @@ const main = async () => {
   })
 
   fs.writeFileSync(usersFilename, insertions.join('\n'))
+
+  process.exit(0)
 }
 
 main()
