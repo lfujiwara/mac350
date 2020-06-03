@@ -34,7 +34,7 @@ const main = async () => {
     ]
 
     const query = knex.raw(
-      `SELECT * FROM inserir_usuario(${params
+      `SELECT inserir_usuario(${params
         .map(param => `\'${param.toString().replace("'", "''")}\'`)
         .join(', ')})`
     )

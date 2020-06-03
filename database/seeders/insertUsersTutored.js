@@ -47,7 +47,7 @@ const main = async () => {
       user.id_tutor,
     ]
 
-    const query = `SELECT * FROM inserir_usuario(${params
+    const query = `SELECT inserir_usuario(${params
       .map(param => `\'${param.toString().replace("'", "''")}\'`)
       .join(', ')})`
 
