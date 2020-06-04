@@ -10,9 +10,12 @@ const knex = require('knex')({
     database: 'mac350_2020',
   },
 })
+const faker = require('faker')
+const gcpf = require('cpf')
 
 const USERS_QTY = 100
 const TUTORED_USERS_QTY = 25
+const PATIENTS_QTY = 500
 
 const main = async () => {
   const generated = generateUsers(USERS_QTY)
@@ -72,6 +75,21 @@ const main = async () => {
 
     insertions.push(`${query};`)
   })
+
+  for (let i = 0; i < PATIENTS_QTY; i++) {
+    const params = [
+      gcpf.generate(false),
+      `${faker.name.firstName()} ${faker.name.lastName()}`,
+      faker.address.streetAddress(true).slice(0, 256),
+      faker.date.between('1960-01-01', '1999-12-31').toISOString(),
+    ]
+
+    const query = `SELECT inserir_paciente(${params
+      .map(param => `\'${param.toString().replace("'", "''")}\'`)
+      .join(', ')})`
+
+    insertions.push(`${query};`)
+  }
 
   fs.writeFileSync(usersFilename, insertions.join('\n'))
 }

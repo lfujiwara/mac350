@@ -1,7 +1,5 @@
 const faker = require('faker')
-const bcrypt = require('bcrypt')
 const gcpf = require('cpf')
-const fs = require('fs')
 
 const areas_de_pesquisa = require('../assets/areas_de_pesquisa')
 const universidades = require('../assets/universidades')
@@ -32,7 +30,7 @@ const generateUser = () => {
       universidades[Math.floor(Math.random() * universidades.length)],
     data_de_nascimento: faker.date.between('1960-01-01', '1999-12-31'),
     login,
-    senha: bcrypt.hashSync(faker.internet.password(15), 10),
+    senha: faker.internet.password(15),
   }
 }
 
