@@ -12,6 +12,7 @@ COPY procedures/insert_patient.sql  /docker-entrypoint-initdb.d/9-insert_patient
 COPY procedures/insert_exam.sql  /docker-entrypoint-initdb.d/A-insert_exam.sql
 COPY procedures/add_service_to_exam.sql  /docker-entrypoint-initdb.d/B-add_service_to_exam.sql
 COPY procedures/add_exam_request.sql /docker-entrypoint-initdb.d/C-add_exam_request.sql
+COPY procedures/add_sample.sql /docker-entrypoint-initdb.d/D-add_sample.sql
 
 ENV POSTGRES_USER MAC350_2020
 ENV POSTGRES_PASSWORD MAC350_2020
