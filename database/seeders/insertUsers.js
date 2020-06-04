@@ -12,6 +12,7 @@ const knex = require('knex')({
 })
 
 const USERS_QTY = 100
+const TUTORED_USERS_QTY = 25
 
 const main = async () => {
   const generated = generateUsers(USERS_QTY)
@@ -38,6 +39,37 @@ const main = async () => {
         .map(param => `\'${param.toString().replace("'", "''")}\'`)
         .join(', ')})`
     )
+    insertions.push(`${query};`)
+  })
+
+  const tutors = users.map(user => user.cpf)
+
+  const generated_tutored = generateUsers(TUTORED_USERS_QTY, {
+    cpf: new Set(...tutors),
+    login: new Set(...users.map(x => x.login)),
+  })
+
+  const tutoredUsers = generated_tutored.users.map(user => ({
+    ...user,
+    id_tutor: tutors[Math.floor(Math.random() * tutors.length)],
+  }))
+
+  tutoredUsers.forEach(user => {
+    const params = [
+      user.cpf,
+      user.nome,
+      user.area_de_pesquisa,
+      user.instituicao,
+      user.data_de_nascimento.toISOString(),
+      user.login,
+      user.senha,
+      user.id_tutor,
+    ]
+
+    const query = `SELECT inserir_usuario_tutorcpf(${params
+      .map(param => `\'${param.toString().replace("'", "''")}\'`)
+      .join(', ')})`
+
     insertions.push(`${query};`)
   })
 
