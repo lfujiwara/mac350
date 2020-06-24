@@ -4,16 +4,16 @@ CREATE FUNCTION inserir_usuario_tutorcpf (cpf char(11), nome varchar(255), area_
   RETURNS int
   LANGUAGE SQL
   AS $$
-  INSERT INTO usuario (cpf, nome, area_de_pesquisa, instituicao, data_de_nascimento, LOGIN, senha, id_tutor)
+  INSERT INTO pessoa (cpf, nome, area_de_pesquisa, instituicao, data_de_nascimento, LOGIN, senha, id_tutor)
     VALUES ($1, $2, $3, $4, $5, $6, $7, (
         SELECT
-          id_usuario
+          id
         FROM
-          usuario
+          pessoa
         WHERE
-          usuario.cpf = $8
+          pessoa.cpf = $8
         LIMIT 1))
 RETURNING
-  id_usuario;
+  id;
 
 $$;

@@ -4,9 +4,9 @@ CREATE FUNCTION inserir_usuario (cpf char(11), nome varchar(255), area_de_pesqui
   RETURNS int
   LANGUAGE SQL
   AS $$
-  INSERT INTO usuario (cpf, nome, area_de_pesquisa, instituicao, data_de_nascimento, LOGIN, senha, id_tutor)
+  INSERT INTO pessoa (cpf, nome, area_de_pesquisa, instituicao, data_de_nascimento, LOGIN, senha, id_tutor)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
   RETURNING
-    id_usuario;
+    id;
 
 $$;
