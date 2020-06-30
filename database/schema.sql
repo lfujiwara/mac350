@@ -67,5 +67,7 @@ CREATE TABLE registro_de_uso (
     id_usuario int NOT NULL REFERENCES pessoa (id),
     id_perfil int NOT NULL REFERENCES perfil (id_perfil),
     id_servico int NOT NULL REFERENCES servico (id_servico),
-    data_de_uso timestamp NOT NULL
+    id_exame int NOT NULL references exame (id_exame)
+    data_de_uso timestamp NOT NULL,
+    UNIQUE (id_exame, id_servico, id_usuario, data_de_uso)
 );
