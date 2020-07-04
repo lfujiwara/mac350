@@ -68,8 +68,8 @@ CREATE OR REPLACE FUNCTION exam_tracker.seleciona_servico_usuario ()
     exam_tracker.servico s
     INNER JOIN exam_tracker.pertence p ON s.id_servico = p.id_servico
     INNER JOIN exam_tracker.possui pos ON p.id_perfil = pos.id_perfil
-    INNER JOIN exam_tracker.pessoa u ON pos.id_usuario = u.id;
-
+    INNER JOIN exam_tracker.pessoa u ON pos.id_usuario = u.id
+  group by nome_de_usuario, s.nome,s.classe,u.area_de_pesquisa,u.instituicao;
 $function$;
 
 -- 4.4
@@ -91,7 +91,8 @@ CREATE OR REPLACE FUNCTION exam_tracker.seleciona_servico_usuario_tutelado ()
   FROM
     exam_tracker.servico s
     INNER JOIN exam_tracker.tutelamento t ON s.id_servico = t.id_servico
-    INNER JOIN exam_tracker.pessoa u ON t.id_usuario_tutelado = u.id;
+    INNER JOIN exam_tracker.pessoa u ON t.id_usuario_tutelado = u.id
+  WHERE t.data_de_inicio <= now() AND t.data_de_termino >= now();
 
 $function$;
 
@@ -111,7 +112,8 @@ CREATE OR REPLACE FUNCTION exam_tracker.seleciona_servico_utilizados ()
     exam_tracker.registro_de_uso rdu
     INNER JOIN exam_tracker.servico s ON rdu.id_servico = s.id_servico
     INNER JOIN exam_tracker.perfil p ON rdu.id_perfil = p.id_perfil
-  GROUP BY
+  GROUP by
+    s.classe,
     rdu.id_servico,
     s.nome,
     p.codigo
