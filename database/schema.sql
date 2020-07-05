@@ -19,6 +19,7 @@ CREATE TABLE perfil (
     tipo varchar(255),
     UNIQUE (codigo)) --Relacionamento possui
 CREATE TABLE possui (
+    id serial PRIMARY KEY,
     id_usuario int NOT NULL REFERENCES pessoa (id),
     id_perfil int NOT NULL REFERENCES perfil (id_perfil),
     UNIQUE (id_usuario, id_perfil))
@@ -28,10 +29,12 @@ CREATE TABLE servico (
     classe varchar(255) NOT NULL CHECK (classe IN ('visualização', 'inserção', 'alteração', 'remoção')),
     UNIQUE (nome, classe)) --Relacionamento pertence
 CREATE TABLE pertence (
+    id serial PRIMARY KEY,
     id_servico int NOT NULL REFERENCES servico (id_servico),
     id_perfil int NOT NULL REFERENCES perfil (id_perfil),
     UNIQUE (id_servico, id_perfil)) --Relacionamento tutelamento
 CREATE TABLE tutelamento (
+    id serial PRIMARY KEY,
     id_usuario_tutelado int NOT NULL REFERENCES pessoa (id),
     id_tutor int NOT NULL REFERENCES pessoa (id),
     id_servico int NOT NULL REFERENCES servico (id_servico),
@@ -45,10 +48,12 @@ CREATE TABLE exame (
     virus varchar(255) NOT NULL,
     UNIQUE (tipo, virus)) --Relacionamento gerencia
 CREATE TABLE gerencia (
+    id serial PRIMARY KEY,
     id_servico int NOT NULL REFERENCES servico (id_servico),
     id_exame int NOT NULL REFERENCES exame (id_exame),
     UNIQUE (id_servico, id_exame)) --Relacionamento realiza
 CREATE TABLE realiza (
+    id serial PRIMARY KEY,
     id_paciente int NOT NULL REFERENCES pessoa (id),
     id_exame int NOT NULL REFERENCES exame (id_exame),
     codigo_amostra varchar(255),
@@ -56,6 +61,7 @@ CREATE TABLE realiza (
     data_de_solicitacao timestamp,
     UNIQUE (id_paciente, id_exame, data_de_realizacao)) --Agregado amostra
 CREATE TABLE amostra (
+    id serial PRIMARY KEY,
     id_paciente int NOT NULL REFERENCES pessoa (id),
     id_exame int NOT NULL REFERENCES exame (id_exame),
     codigo_amostra varchar(255) NOT NULL,
@@ -67,7 +73,7 @@ CREATE TABLE registro_de_uso (
     id_usuario int NOT NULL REFERENCES pessoa (id),
     id_perfil int NOT NULL REFERENCES perfil (id_perfil),
     id_servico int NOT NULL REFERENCES servico (id_servico),
-    id_exame int NOT NULL references exame (id_exame)
+    id_exame int NOT NULL references exame (id_exame),
     data_de_uso timestamp NOT NULL,
     UNIQUE (id_exame, id_servico, id_usuario, data_de_uso)
 );

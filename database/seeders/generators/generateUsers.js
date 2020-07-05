@@ -28,7 +28,7 @@ const generateUser = () => {
       areas_de_pesquisa[Math.floor(Math.random() * areas_de_pesquisa.length)],
     instituicao:
       universidades[Math.floor(Math.random() * universidades.length)],
-    data_de_nascimento: faker.date.between('1960-01-01', '1999-12-31'),
+    data_de_nascimento: faker.date.between('1960-01-01', '1999-12-31').toISOString(),
     login,
     senha: faker.internet.password(15),
   }

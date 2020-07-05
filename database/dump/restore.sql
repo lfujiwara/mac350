@@ -19,6 +19,7 @@ CREATE TABLE perfil (
     tipo varchar(255),
     UNIQUE (codigo)) --Relacionamento possui
 CREATE TABLE possui (
+    id serial PRIMARY KEY,
     id_usuario int NOT NULL REFERENCES pessoa (id),
     id_perfil int NOT NULL REFERENCES perfil (id_perfil),
     UNIQUE (id_usuario, id_perfil))
@@ -28,10 +29,12 @@ CREATE TABLE servico (
     classe varchar(255) NOT NULL CHECK (classe IN ('visualização', 'inserção', 'alteração', 'remoção')),
     UNIQUE (nome, classe)) --Relacionamento pertence
 CREATE TABLE pertence (
+    id serial PRIMARY KEY,
     id_servico int NOT NULL REFERENCES servico (id_servico),
     id_perfil int NOT NULL REFERENCES perfil (id_perfil),
     UNIQUE (id_servico, id_perfil)) --Relacionamento tutelamento
 CREATE TABLE tutelamento (
+    id serial PRIMARY KEY,
     id_usuario_tutelado int NOT NULL REFERENCES pessoa (id),
     id_tutor int NOT NULL REFERENCES pessoa (id),
     id_servico int NOT NULL REFERENCES servico (id_servico),
@@ -45,10 +48,12 @@ CREATE TABLE exame (
     virus varchar(255) NOT NULL,
     UNIQUE (tipo, virus)) --Relacionamento gerencia
 CREATE TABLE gerencia (
+    id serial PRIMARY KEY,
     id_servico int NOT NULL REFERENCES servico (id_servico),
     id_exame int NOT NULL REFERENCES exame (id_exame),
     UNIQUE (id_servico, id_exame)) --Relacionamento realiza
 CREATE TABLE realiza (
+    id serial PRIMARY KEY,
     id_paciente int NOT NULL REFERENCES pessoa (id),
     id_exame int NOT NULL REFERENCES exame (id_exame),
     codigo_amostra varchar(255),
@@ -56,6 +61,7 @@ CREATE TABLE realiza (
     data_de_solicitacao timestamp,
     UNIQUE (id_paciente, id_exame, data_de_realizacao)) --Agregado amostra
 CREATE TABLE amostra (
+    id serial PRIMARY KEY,
     id_paciente int NOT NULL REFERENCES pessoa (id),
     id_exame int NOT NULL REFERENCES exame (id_exame),
     codigo_amostra varchar(255) NOT NULL,
@@ -67,7 +73,9 @@ CREATE TABLE registro_de_uso (
     id_usuario int NOT NULL REFERENCES pessoa (id),
     id_perfil int NOT NULL REFERENCES perfil (id_perfil),
     id_servico int NOT NULL REFERENCES servico (id_servico),
-    data_de_uso timestamp NOT NULL
+    id_exame int NOT NULL references exame (id_exame),
+    data_de_uso timestamp NOT NULL,
+    UNIQUE (id_exame, id_servico, id_usuario, data_de_uso)
 );
 SET search_path TO exam_tracker;
 
@@ -83,22 +91,21 @@ CREATE FUNCTION inserir_usuario (cpf char(11), nome varchar(255), area_de_pesqui
 $$;
 SET search_path TO exam_tracker;
 
-CREATE FUNCTION inserir_usuario_tutorcpf (cpf char(11), nome varchar(255), area_de_pesquisa varchar(255), instituicao varchar(255), data_de_nascimento date, LOGIN VARCHAR(255), senha varchar(255), cpf_tutor varchar(11))
+CREATE FUNCTION inserir_usuario_tutorcpf (
+  cpf char(11), nome varchar(255), area_de_pesquisa varchar(255), instituicao varchar(255), data_de_nascimento date, LOGIN VARCHAR(255), senha varchar(255),
+  cpf_tutor varchar(11), id_servico int, id_perfil int, data_de_inicio date, data_de_termino date DEFAULT NULL)
   RETURNS int
   LANGUAGE SQL
   AS $$
   INSERT INTO pessoa (cpf, nome, area_de_pesquisa, instituicao, data_de_nascimento, LOGIN, senha, id_tutor)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, (
-        SELECT
-          id
-        FROM
-          pessoa
-        WHERE
-          pessoa.cpf = $8
-        LIMIT 1))
-RETURNING
-  id;
-
+    VALUES ($1, $2, $3, $4, $5, $6, $7, (SELECT id FROM pessoa WHERE pessoa.cpf = $8 LIMIT 1));
+  INSERT INTO tutelamento (id_usuario_tutelado, id_tutor, id_servico, id_perfil, data_de_inicio, data_de_termino)
+    VALUES (
+      (SELECT id FROM pessoa WHERE pessoa.cpf = $1 LIMIT 1),
+      (SELECT id FROM pessoa WHERE pessoa.cpf = $8 LIMIT 1),
+      $9, $10, $11, $12)
+  RETURNING
+    id_usuario_tutelado;
 $$;
 SET search_path TO exam_tracker;
 
@@ -150,6 +157,7 @@ CREATE FUNCTION adicionar_tutor_a_usuario (id_usuario_tutelado int, id_tutor int
   RETURNS void
   LANGUAGE SQL
   AS $$
+  UPDATE pessoa SET id_tutor = $2 WHERE id = $1;
   INSERT INTO tutelamento (id_usuario_tutelado, id_tutor, id_servico, id_perfil, data_de_inicio, data_de_termino)
     VALUES ($1, $2, $3, $4, $5, $6);
 
@@ -289,8 +297,8 @@ CREATE OR REPLACE FUNCTION exam_tracker.seleciona_servico_usuario ()
     exam_tracker.servico s
     INNER JOIN exam_tracker.pertence p ON s.id_servico = p.id_servico
     INNER JOIN exam_tracker.possui pos ON p.id_perfil = pos.id_perfil
-    INNER JOIN exam_tracker.pessoa u ON pos.id_usuario = u.id;
-
+    INNER JOIN exam_tracker.pessoa u ON pos.id_usuario = u.id
+  group by nome_de_usuario, s.nome,s.classe,u.area_de_pesquisa,u.instituicao;
 $function$;
 
 -- 4.4
@@ -312,7 +320,8 @@ CREATE OR REPLACE FUNCTION exam_tracker.seleciona_servico_usuario_tutelado ()
   FROM
     exam_tracker.servico s
     INNER JOIN exam_tracker.tutelamento t ON s.id_servico = t.id_servico
-    INNER JOIN exam_tracker.pessoa u ON t.id_usuario_tutelado = u.id;
+    INNER JOIN exam_tracker.pessoa u ON t.id_usuario_tutelado = u.id
+  WHERE t.data_de_inicio <= now() AND t.data_de_termino >= now();
 
 $function$;
 
@@ -332,7 +341,8 @@ CREATE OR REPLACE FUNCTION exam_tracker.seleciona_servico_utilizados ()
     exam_tracker.registro_de_uso rdu
     INNER JOIN exam_tracker.servico s ON rdu.id_servico = s.id_servico
     INNER JOIN exam_tracker.perfil p ON rdu.id_perfil = p.id_perfil
-  GROUP BY
+  GROUP by
+    s.classe,
     rdu.id_servico,
     s.nome,
     p.codigo

@@ -24,7 +24,45 @@ const main = async () => {
 
   const usersFilename = `${__dirname}/dump/insert_users.sql`
 
-  const insertions = ['SET search_path TO exam_tracker;']
+  const insertions = [
+    'SET search_path TO exam_tracker;',
+    "SELECT inserir_servico('Inserir exame', 'inserção');",
+    "SELECT inserir_servico('Visualizar qualquer exame', 'visualização');",
+    "SELECT inserir_servico('Alterar qualquer exame', 'alteração');",
+    "SELECT inserir_servico('Remover qualquer exame', 'remoção');",
+    "SELECT inserir_perfil('DEFAULT', 'Acesso padrão');",
+    "SELECT inserir_perfil('GUEST', 'Acesso convidado');",
+    "SELECT inserir_perfil('ROOT', 'Superusuário');",
+  ]
+
+  const postInsertions = []
+
+  const services = {
+    create:
+      "SELECT id_servico FROM servico WHERE servico.nome = 'Inserir exame' LIMIT 1",
+    read:
+      "SELECT id_servico FROM servico WHERE servico.nome = 'Visualizar qualquer exame' LIMIT 1",
+    update:
+      "SELECT id_servico FROM servico WHERE servico.nome = 'Alterar qualquer exame' LIMIT 1",
+    delete:
+      "SELECT id_servico FROM servico WHERE servico.nome = 'Remover qualquer exame' LIMIT 1",
+  }
+
+  const profiles = {
+    default:
+      "SELECT id_perfil FROM perfil WHERE perfil.tipo = 'Acesso padrão' LIMIT 1",
+    guest:
+      "SELECT id_perfil FROM perfil WHERE perfil.tipo = 'Acesso convidado' LIMIT 1",
+    root:
+      "SELECT id_perfil FROM perfil WHERE perfil.tipo = 'Superusuário' LIMIT 1",
+  }
+
+  const selectByCpf = cpf =>
+    `SELECT id FROM pessoa WHERE pessoa.cpf = '${cpf}' LIMIT 1`
+  const selectProfileByCpf = cpf =>
+    `SELECT id_perfil FROM possui WHERE possui.id_usuario = (${selectByCpf(
+      cpf
+    )}) LIMIT 1`
 
   users.forEach(user => {
     const params = [
@@ -32,7 +70,7 @@ const main = async () => {
       user.nome,
       user.area_de_pesquisa,
       user.instituicao,
-      user.data_de_nascimento.toISOString(),
+      user.data_de_nascimento,
       user.login,
       user.senha,
     ]
@@ -43,7 +81,14 @@ const main = async () => {
         .join(', ')})`
     )
     insertions.push(`${query};`)
+    postInsertions.push(
+      `SELECT adicionar_perfil_a_usuario((${faker.random.arrayElement(
+        Object.values([profiles.default, profiles.root])
+      )}), (${selectByCpf(user.cpf)}));`
+    )
   })
+
+  insertions.push('COMMIT;', ...postInsertions)
 
   const tutors = users.map(user => user.cpf)
 
@@ -54,24 +99,41 @@ const main = async () => {
 
   const tutoredUsers = generated_tutored.users.map(user => ({
     ...user,
-    id_tutor: tutors[Math.floor(Math.random() * tutors.length)],
+    cpf_tutor: tutors[Math.floor(Math.random() * tutors.length)],
   }))
 
   tutoredUsers.forEach(user => {
+    const interval = 1000 * 60 * 60 * 24 * 180
+    const startDate = faker.date
+      .between(new Date(Date.now() - interval), new Date(Date.now() + interval))
+      .toISOString()
+    const endDate = faker.date
+      .between(
+        new Date(new Date(startDate).getTime() + interval / 180),
+        new Date(new Date(startDate).getTime() + interval)
+      )
+      .toISOString()
+
     const params = [
       user.cpf,
       user.nome,
       user.area_de_pesquisa,
       user.instituicao,
-      user.data_de_nascimento.toISOString(),
+      user.data_de_nascimento,
       user.login,
       user.senha,
-      user.id_tutor,
+      user.cpf_tutor,
     ]
 
-    const query = `SELECT inserir_usuario_tutorcpf(${params
-      .map(param => `\'${param.toString().replace("'", "''")}\'`)
-      .join(', ')})`
+    const query = `SELECT inserir_usuario_tutorcpf(${[
+      ...params.map(param => `\'${param.toString().replace(/'/, "''")}\'`),
+      `(${faker.random.arrayElement(Object.values(services))})`,
+      `(${faker.random.arrayElement(
+        Object.values([selectProfileByCpf(user.cpf_tutor), profiles.guest])
+      )})`,
+      `'${startDate}'`,
+      `'${endDate}'`,
+    ].join(', ')})`
 
     insertions.push(`${query};`)
   })
