@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MAC350 - Projeto</title>
+    {% load static %}
+    <link rel="icon" href="{% static '/favicon.ico' %}" />
+    <link rel="stylesheet" href="{% static '/bootstrap.min.css' %}" />
+    <script src="{% static '/jquery-3.5.1.min.js' %}"></script>
+    <script src="{% static '/bootstrap.bundle.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static '/main.css' %}" />
+  </head>
+  <body class="montserrat">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">MAC350 - Projeto</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="#">Amostras</a>
+          <a class="nav-item nav-link" href="#">Exames</a>
+          <a class="nav-item nav-link" href="#">Perfis</a>
+          <a class="nav-item nav-link" href="#">Pessoas</a>
+          <a class="nav-item nav-link" href="#">Usuários</a>
+          <a class="nav-item nav-link" href="#">Logs</a>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      {% block content %} {% endblock %}
+    </div>
+  </body>
+</html>
