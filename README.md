@@ -16,3 +16,5 @@ Grupo:
 - Interface:
   - CRUD: A interface do Django já faz isto, para tal, habilitamos nas configurações e alteramos a representação (método `__str__`).
   - Para visualizar as queries, utilizamos bootstrap junto com o template engine do django, basta ir em `localhost:8000`
+- Configuração de conexão com o banco de dados (`web/examtracker/settings.py`)
+  ![image-20200705233452706](md-assets\image-20200705233452706.png)
