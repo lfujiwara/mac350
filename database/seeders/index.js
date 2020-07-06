@@ -57,6 +57,22 @@ const main = async () => {
       "SELECT id_perfil FROM perfil WHERE perfil.tipo = 'Superusuário' LIMIT 1",
   }
 
+  Object.values(services).forEach(v =>
+    insertions.push(
+      `SELECT adicionar_servico_a_perfil((${v}), (${profiles.root}));`
+    )
+  )
+
+  Array.from([services.read, services.create]).forEach(v =>
+    insertions.push(
+      `SELECT adicionar_servico_a_perfil((${v}), (${profiles.default}));`
+    )
+  )
+
+  insertions.push(
+    `SELECT adicionar_servico_a_perfil((${services.read}), (${profiles.guest}));`
+  )
+
   const selectByCpf = cpf =>
     `SELECT id FROM pessoa WHERE pessoa.cpf = '${cpf}' LIMIT 1`
   const selectProfileByCpf = cpf =>

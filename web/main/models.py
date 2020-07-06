@@ -51,7 +51,7 @@ class Possui(models.Model):
         verbose_name = 'Posse (usuário-perfil)'
 
     def __str__(self):
-        return f'Usuário {self.id_usuario} possui o perfil {self.id_perfil}'
+        return f'usuário {self.id_usuario} possui o perfil {self.id_perfil}'
 
 
 class Servico(models.Model):
@@ -107,7 +107,7 @@ class Tutelamento(models.Model):
     def __str__(self):
         valid = date.today() >= self.data_de_inicio and date.today() <= self.data_de_termino
         text = '[INVÁLIDO] ' if valid else ''
-        return f'{text}Usuário {self.id_tutor} cede acesso ao usuário {self.id_usuario_tutelado} no perfil {self.id_perfil} para serviço {self.id_servico}'
+        return f'{text}usuário {self.id_tutor} cede acesso ao usuário {self.id_usuario_tutelado} no perfil {self.id_perfil} para serviço {self.id_servico}'
 
 
 class Exame(models.Model):
@@ -119,6 +119,9 @@ class Exame(models.Model):
         managed = True
         db_table = 'exame'
         unique_together = (('tipo', 'virus'),)
+
+    def __str__(self):
+        return f'tipo {self.tipo} para virus {self.virus}'
 
 
 class Gerencia(models.Model):
@@ -133,6 +136,9 @@ class Gerencia(models.Model):
         unique_together = (('id_servico', 'id_exame'),)
         verbose_name_plural = 'gerenciamentos (serviço-exame)'
         verbose_name = 'gerenciamento (serviço-exame)'
+
+    def __str__(self):
+        return f'servico {self.servico} gerencia {self.exame}'
 
 
 class Realiza(models.Model):
@@ -150,6 +156,9 @@ class Realiza(models.Model):
         unique_together = (('id_paciente', 'id_exame', 'data_de_realizacao'),)
         verbose_name_plural = 'realizações'
 
+    def __str__(self):
+        return f'Exame {self.id_exame}, paciente {self.id_paciente}, solicitado em {self.data_de_solicitacao}, realizado em {self.data_de_realizacao}, amostra {self.codigo_amostra}'
+
 
 class Amostra(models.Model):
     id_paciente = models.ForeignKey(
@@ -165,6 +174,9 @@ class Amostra(models.Model):
         db_table = 'amostra'
         unique_together = (('id_paciente', 'id_exame', 'codigo_amostra'),)
 
+    def __str__(self):
+        return f'Paciente {self.id_paciente} para exame {self.id_exame}, com código {self.codigo_amostra}, coletado via {self.metodo_de_coleta} ({self.material})'
+
 
 class RegistroDeUso(models.Model):
     id_registro_de_uso = models.AutoField(primary_key=True)
@@ -174,9 +186,14 @@ class RegistroDeUso(models.Model):
         Perfil, models.DO_NOTHING, db_column='id_perfil')
     id_servico = models.ForeignKey(
         'Servico', models.DO_NOTHING, db_column='id_servico')
+    id_exame = models.ForeignKey(
+        'Exame', models.DO_NOTHING, db_column='id_exame')
     data_de_uso = models.DateTimeField()
 
     class Meta:
         managed = True
         db_table = 'registro_de_uso'
         verbose_name_plural = 'registros de uso'
+
+    def __str__(self):
+        return f'Usuário {self.id_usuario} com perfil {self.id_perfil}  usou o serviço {self.id_servico} para visualizar os exames {self.id_exame} em {self.data_de_uso}'
